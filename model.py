@@ -18,7 +18,6 @@
 
 import logging
 import queue
-import sys
 import tkinter
 import uuid
 from collections.abc import Callable
@@ -191,6 +190,7 @@ class Model:
         self.min_times = IntVar(name="min_times")
         self.time_threshold = DoubleVar(name="time_threshold")
         self.dq_mode = StringVar(name="dq_mode")
+        self.autosave_scoreboard = BooleanVar(name="autosave_scoreboard")
         # Preview
         self.appearance_preview = ImageVar(PILImage.Image())
         # Directories
@@ -200,6 +200,7 @@ class Model:
         # The timing system will get updated/set properly before use
         self.timing_system: TimingSystem = DolphinDo4()
         self.dir_results = StringVar(name="dir_results")
+        self.dir_autosave = StringVar(name="dir_autosave")
         self.results_contents = RaceResultListVar([])
         # Run tab
         self.cc_status = ChromecastStatusVar([])
@@ -226,24 +227,10 @@ class Model:
         # It's also part of USA-S visual identity standards
         # https://www.usaswimming.org/docs/default-source/marketingdocuments/usa-swimming-logo-standards-manual.pdf
         # macos doesn't have Calibri installed by default, so we use Helvetica
-        default_font_normal = ""
-        if sys.platform == "win32":
-            default_font_normal = "Calibri"
-        elif sys.platform == "darwin":
-            default_font_normal = "Helvetica"
-        else:
-            default_font_normal = "Times"
-        self.font_normal.set(data.get("font_normal", default_font_normal))
+        self.font_normal.set(data.get("font_normal", "Helvetica"))
         # Consolas (monospace) is standard since Vista
         # macos doesn't have Consolas installed by default, so we use Courier
-        default_font_time = ""
-        if sys.platform == "win32":
-            default_font_time = "Consolas"
-        elif sys.platform == "darwin":
-            default_font_time = "Courier"
-        else:
-            default_font_time = "Arial"
-        self.font_time.set(data.get("font_time", default_font_time))
+        self.font_time.set(data.get("font_time", "Courier"))
         self.text_spacing.set(data.getfloat("text_spacing", 1.1))
         self.title.set(data.get("title", "Wahoo! Results"))
         self.image_bg.set(data.get("image_bg", ""))
@@ -260,9 +247,11 @@ class Model:
         self.min_times.set(data.getint("min_times", 2))
         self.time_threshold.set(data.getfloat("time_threshold", 0.30))
         self.dq_mode.set(data.get("dq_mode", DQMode.IGNORE))
+        self.autosave_scoreboard.set(data.getboolean("autosave_scoreboard", False))
         self.dir_startlist.set(data.get("dir_startlist", "C:\\swmeets8"))
         self.result_format.set(data.get("result_format", "Dolphin - do4"))
         self.dir_results.set(data.get("dir_results", "C:\\CTSDolphin"))
+        self.dir_autosave.set(data.get("dir_autosave", "C:\\wahoo-results-images"))
         client_id = data.get("client_id")
         if client_id is None or len(client_id) == 0:
             client_id = str(uuid.uuid4())
@@ -298,9 +287,11 @@ class Model:
             "min_times": str(self.min_times.get()),
             "time_threshold": str(self.time_threshold.get()),
             "dq_mode": self.dq_mode.get(),
+            "autosave_scoreboard": str(self.autosave_scoreboard.get()),
             "dir_startlist": self.dir_startlist.get(),
             "result_format": self.result_format.get(),
             "dir_results": self.dir_results.get(),
+            "dir_autosave": self.dir_autosave.get(),
             "client_id": self.client_id.get(),
             "analytics": str(self.analytics.get()),
         }
