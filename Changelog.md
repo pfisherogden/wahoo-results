@@ -7,6 +7,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### [Unreleased]
 
+### [1.3.2] - 2025-06-22
+
+#### Fixed
+
+- :bug: Fix font defaults and file processing to work on macos
+- :bug: Allow resizing as the default size on macos cuts off features
+
+#### Added
+
+- :sparkles: Added support to show timers that are off by > threshold seconds
+- :sparkles: Added ability to autosave generated scoreboard images
+
 ### [1.3.1] - 2025-05-17
 
 #### Fixed
