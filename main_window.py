@@ -18,7 +18,17 @@
 
 import os
 import sys
-from tkinter import FALSE, HORIZONTAL, Menu, StringVar, TclError, Tk, Widget, ttk
+from tkinter import (
+    FALSE,
+    HORIZONTAL,
+    Menu,
+    PhotoImage,
+    StringVar,
+    TclError,
+    Tk,
+    Widget,
+    ttk,
+)
 
 from PIL import ImageTk
 
@@ -64,12 +74,21 @@ class View(ttk.Frame):
         bundle_dir = getattr(
             sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__))
         )
-        icon_file = os.path.abspath(os.path.join(bundle_dir, "media", "wr-icon.ico"))
-        root.iconphoto(True, ImageTk.PhotoImage(file=icon_file))  # type: ignore
-        try:
-            root.iconbitmap(icon_file)  # type: ignore
-        except TclError:  # On linux, we can't set a Windows icon file
-            pass
+        if sys.platform == "win32":
+            icon_file = os.path.abspath(os.path.join(bundle_dir, "media", "wr-icon.ico"))
+            try:
+                root.iconphoto(True, ImageTk.PhotoImage(file=icon_file))  # type: ignore
+                root.iconbitmap(icon_file)  # type: ignore
+            except (TclError, OSError):
+                pass
+        else:
+            icon_file = os.path.abspath(os.path.join(bundle_dir, "media", "wr-icon.png"))
+            try:
+                # Use standard tkinter PhotoImage for PNGs
+                img = PhotoImage(file=icon_file)
+                root.iconphoto(True, img)  # type: ignore
+            except (TclError, OSError):
+                pass
         # Insert ourselves into the main window
         self.pack(side="top", fill="both", expand=True)
         self._build_menu()

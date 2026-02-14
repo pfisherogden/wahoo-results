@@ -16,7 +16,9 @@
 
 """TKinter code to display various UI widgets."""
 
+import base64
 import copy
+import io
 import os
 from datetime import datetime
 from tkinter import (
@@ -24,6 +26,7 @@ from tkinter import (
     Canvas,
     DoubleVar,
     Misc,
+    PhotoImage,
     StringVar,
     TclError,
     colorchooser,
@@ -33,7 +36,6 @@ from tkinter import (
 from typing import Any
 
 import PIL.Image as PILImage
-from PIL import ImageTk
 
 from model import (
     ChromecastStatusVar,
@@ -47,7 +49,19 @@ from raceinfo import Time, format_time
 TkContainer = Any
 
 
-def swatch(width: int, height: int, color: str) -> ImageTk.PhotoImage:
+def pil_to_tk(img: PILImage.Image) -> PhotoImage:
+    """Convert a PIL image to a tkinter PhotoImage robustly.
+
+    This uses a base64 encoded PNG to avoid issues with ImageTk.PhotoImage
+    in frozen applications on macOS.
+    """
+    with io.BytesIO() as output:
+        img.save(output, format="PNG")
+        contents = output.getvalue()
+    return PhotoImage(data=base64.b64encode(contents))
+
+
+def swatch(width: int, height: int, color: str) -> PhotoImage:
     """Generate a color swatch.
 
     :param width: Width of the swatch
@@ -55,7 +69,7 @@ def swatch(width: int, height: int, color: str) -> ImageTk.PhotoImage:
     :param color: Color for the swatch
     """
     img = PILImage.new("RGBA", (width, height), color)
-    return ImageTk.PhotoImage(img)
+    return pil_to_tk(img)
 
 
 class ColorButton2(ttk.Button):
@@ -100,7 +114,7 @@ class ImageView(Canvas):
         :param image_var: Variable to hold the associated image
         """
         super().__init__(parent)
-        self._img: ImageTk.PhotoImage | None = None
+        self._img: PhotoImage | None = None
         self._image_var = image_var
         # Watch for changes to the image and redraw the canvas
         self._trace_name = image_var.trace_add(
@@ -131,7 +145,7 @@ class ImageView(Canvas):
         # Note: In order for the image to display on the canvas, we need to
         # keep a reference to it, so it gets assigned to _img even though
         # it's not used anywhere else.
-        self._img = ImageTk.PhotoImage(scaled)
+        self._img = pil_to_tk(scaled)
         self.delete("all")
         self.create_image(  # type:ignore
             canvas_width // 2,
