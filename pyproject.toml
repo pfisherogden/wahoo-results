@@ -53,12 +53,13 @@ exclude_lines = [
 ]
 
 ignore_errors = true
-omit = ["*_test.py", "build.py"]
+omit = ["*_test.py", "build.py", ".venv/*", ".uv_cache/*", ".uv_python/*", ".git/*"]
 skip_empty = true
 
 [tool.coverage.run]
 branch = true  # Enable branch coverage
 source = ["."] # Source code directories
+omit = ["*_test.py", "build.py", ".venv/*", ".uv_cache/*", ".uv_python/*", ".git/*"]
 
 [tool.coverage.xml]
 output = "coverage.xml"
