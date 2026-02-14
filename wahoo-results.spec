@@ -10,18 +10,25 @@ block_cipher = None
 
 # On Windows, we can set version information.
 version_file = None
+icon_file = os.path.join("media", "wr-icon.ico")
 if sys.platform == "win32":
     version_file = "wahoo-results.fileinfo"
+elif sys.platform == "darwin":
+    icon_file = os.path.join("media", "wr-icon.png")
 
 a = Analysis(
     ["wahoo_results.py"],
     pathex=[],
     binaries=[],
-    datas=[(os.path.join("media", "wr-icon.ico"), "media")],
+    datas=[
+        (os.path.join("media", "wr-icon.ico"), "media"),
+        (os.path.join("media", "wr-icon.png"), "media"),
+    ],
     hiddenimports=[
         # Needed starting with zeroconf 0.128.0 -> 0.131.0 transition
         "zeroconf._handlers.answers",
         "zeroconf._utils.ipaddress",
+        "PIL._tkinter_finder",
     ],
     hookspath=[],
     hooksconfig={},
@@ -73,6 +80,14 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=os.path.join("media", "wr-icon.ico"),
+    icon=icon_file,
     version=version_file,
 )
+
+if sys.platform == "darwin":
+    app = BUNDLE(
+        exe,
+        name="wahoo-results.app",
+        icon=icon_file,
+        bundle_identifier="com.wahoo-results.app",
+    )
