@@ -58,7 +58,10 @@ class View(ttk.Frame):
         self._vm = vm
         root.title("Wahoo! Results")
         # Common screen sizes: HD=1366x768 FHD=1920x1080
-        root.resizable(False, False)
+        if sys.platform == "win32":
+            root.resizable(False, False)
+        else:
+            root.resizable(True, True)
         screen_width = root.winfo_screenwidth()
         screen_height = root.winfo_screenheight()
 
