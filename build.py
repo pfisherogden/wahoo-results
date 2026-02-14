@@ -36,6 +36,10 @@ try:
     shutil.rmtree("build")
 except FileNotFoundError:
     pass
+try:
+    shutil.rmtree("wahoo-results.app")
+except FileNotFoundError:
+    pass
 
 # Determine current git tag
 git_ref = (
@@ -130,3 +134,15 @@ print("Invoking PyInstaller to generate executable...\n")
 
 # Build it
 PyInstaller.__main__.run(["--distpath=.", "--workpath=build", "wahoo-results.spec"])
+
+if sys.platform == "darwin":
+    app_path = "wahoo-results.app"
+    if os.path.exists(app_path):
+        print(f"Cleaning up detritus from {app_path} to allow signing...")
+        os.system(f"dot_clean {app_path}")
+        os.system(f"xattr -cr {app_path}")
+        # Try to sign again if it failed
+        print("Attempting to sign the bundle...")
+        os.system(
+            f"codesign -s - --force --all-architectures --timestamp --deep {app_path}"
+        )
