@@ -591,16 +591,15 @@ def main() -> None:  # noqa: PLR0915
 
     # Allow the root window to build, then close the splash screen if it's up
     # and we're running in exe mode
-    try:
-        root.update()
-        import pyi_splash  # noqa: PLC0415 # type: ignore
+    if sys.platform != "darwin":
+        try:
+            root.update()
+            import pyi_splash  # noqa: PLC0415 # type: ignore
 
-        if pyi_splash.is_alive():
-            pyi_splash.close()
-    except ModuleNotFoundError:
-        pass
-    except RuntimeError:
-        pass
+            if pyi_splash.is_alive():
+                pyi_splash.close()
+        except (ModuleNotFoundError, RuntimeError):
+            pass
 
     if args.test is not None:
         scenario = autotest.build_scenario(model, args.test)
