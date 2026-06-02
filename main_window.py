@@ -48,8 +48,9 @@ class View(ttk.Frame):
         root.title("Wahoo! Results")
         # Common screen sizes: HD=1366x768 FHD=1920x1080
         # Fix the window to 1/2 the size of the screen so that it's manageable
-        root.resizable(False, False)
-        root.geometry(f"{1366 // 2}x{768 // 2}")
+        root.resizable(True, True)
+        root.geometry(f"{int(1366 * 0.5)}x{int(768 * 0.5)}")
+
         bundle_dir = getattr(
             sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__))
         )

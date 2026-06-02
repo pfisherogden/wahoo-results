@@ -1,0 +1,41 @@
+name: Build Windows Executable
+
+on:
+  push:
+    branches:
+      - build/v1.3.1-patched
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+          pip install PyInstaller semver
+
+      - name: Run Build Script
+        run: |
+          python build.py
+        env:
+          SEGMENT_WRITE_KEY: "unknown"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wahoo-results-patched-windows
+          path: wahoo-results.exe
